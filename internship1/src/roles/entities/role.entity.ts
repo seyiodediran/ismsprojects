@@ -1,5 +1,6 @@
 import { FunctionalArea } from "src/global/app.enum";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Role {
@@ -14,4 +15,9 @@ export class Role {
 
     @Column({ type: 'enum', enum: FunctionalArea, nullable: true })
     functionalArea: FunctionalArea;
+
+    @JoinTable()
+    @ManyToMany(() => User, user => user.roles)
+    users: User[]
+
 }

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class UserProfile {
@@ -11,4 +12,10 @@ export class UserProfile {
     @Column({ nullable: true })
     photoMimeType: string; //save the encoding of uploaded file for content-type use for reply.type as shown above
 
+    @Column()
+    userId: number;
+
+    @OneToOne(() => User, user => user.userProfile)
+    @JoinColumn({ name: 'userId'})
+    user: User;
 }

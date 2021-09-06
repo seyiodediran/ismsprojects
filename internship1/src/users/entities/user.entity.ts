@@ -1,13 +1,14 @@
+import { Department } from "src/departments/entities/department.entity";
 import { Employee } from "src/employees/entities/employee.entity";
 import { CountryList, Gender } from "src/global/app.enum";
 import { Role } from "src/roles/entities/role.entity";
 import { UserProfile } from "src/user-profiles/entities/user-profile.entity";
-import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number; // since it is a generated field we wouldnt add it to the dto
 
     @Column()
     firstName: string;
@@ -100,21 +101,27 @@ export class User {
     @Column({ nullable: true, select: false })
     otpSecret: string;
 
-    /* for refresh token save after successful login/
+    // for refresh token save after successful login/
     @Column({ select: false, nullable: true })
-    public refreshTokenHash: string;*/
+    refreshTokenHash: string;
 
 
     @OneToOne(() => Employee)
     @JoinColumn()
     employee: Employee
 
-    @OneToOne(() => UserProfile)
-    @JoinColumn()
+    @OneToOne(() => UserProfile, userProfile => userProfile.user, { cascade: true })
     userProfile: UserProfile
 
-    @ManyToMany(() => Role)
-    @JoinTable()
-    role: Role[];
+
+    @Column({ nullable: true })
+    departmentId: number;
+
+    @ManyToOne(() => Department, department => department.users, { cascade: true })
+    @JoinColumn({name: "departmentId"})
+    department: Department;
+
+    @ManyToMany(() => Role, role => role.users)
+    roles: Role[];
 
 }
