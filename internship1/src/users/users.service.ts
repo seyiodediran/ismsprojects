@@ -89,7 +89,7 @@ export class UsersService {
           updateUserDto.passwordHash = hash
         })
 
-        return await this.userRepository.update(id, { ...updateUserDto })
+        return await this.userRepository.update(id, { ...updateUserDto }) // why did we use a spread operator to declare our dto here?
 
 
       }
@@ -130,10 +130,13 @@ export class UsersService {
 
 
   // * Relationships
+
+  //here we are adding role(s) to a user
+
   async addRoleById(userId: number, RoleId: number): Promise<void> { // here we use add because its many. if theres only a possibility of setting one we use 'set'
     try {
       return await this.userRepository.createQueryBuilder()
-        .relation(User, 'roles') // the relation you want to work with and the field in that table
+        .relation(User, 'roles') // the relation you want to work with and the field in that table. question-- why is User passed as a parameter?
         .of(userId) // relation of which particular user -- userId in this case 
         .add(RoleId) // what do we want to do? -- we want to add the field RoleId
     }
@@ -150,7 +153,7 @@ export class UsersService {
       return await this.userRepository.createQueryBuilder()
         .relation(User, 'roles') // the relation you want to work with and the field in that table
         .of(userId) // relation of which particular user -- userId in this case 
-        .remove(RoleIds) // what do we want to do? -- we want to add the field RoleId
+        .add(RoleIds) // what do we want to do? -- we want to add the field RoleId
     }
     catch (err) {
 
@@ -170,28 +173,45 @@ export class UsersService {
     }
   }
 
-  // assigning multiple roles to one user at a go
-  // you can use this for either adding one role or multiple roles bc array accepts one or more values. Using the 2 methods is redundant
+  // remove multiple roles from one user at a go
+  // you can use this for either removing one role or multiple roles bc array accepts one or more values. Using the 2 methods is redundant
 
   async removeRolesById(userId: number, RoleIds: number[]): Promise<void> { // here we use add because its many. if theres only a possibility of setting one we use 'set'
     try {
       return await this.userRepository.createQueryBuilder()
         .relation(User, 'roles') // the relation you want to work with and the field in that table
         .of(userId) // relation of which particular user -- userId in this case 
-        .add(RoleIds) // what do we want to do? -- we want to add the field RoleId
+        .remove(RoleIds) // what do we want to do? -- we want to add the field RoleId
     }
     catch (err) {
 
     }
   }
 
+  // add Departments by id
+
+  async addDepartmentById(userId: number, departmentId: number): Promise<void> {
+    return await this.userRepository.createQueryBuilder()
+    .relation(User, 'department')
+    .of(userId)
+    .add(departmentId)
+  }
+
+  // remove Departments by id
+
+  async removeDepartmentById(userId: number, departmentId: number): Promise<void> {
+    return await this.userRepository.createQueryBuilder()
+    .relation(User, 'department')
+    .of(userId)
+    .remove(departmentId)
+  }
 
   async setUserProfileById(userId: number, userProfileId: number): Promise<void> {
     try {
       return await this.userRepository.createQueryBuilder()
-      .relation(User, 'userProfiles')
-      .of(userId)
-      .set(userProfileId)
+        .relation(User, 'userProfiles')
+        .of(userId)
+        .set(userProfileId)
     } catch (err) {
 
     }
@@ -200,9 +220,9 @@ export class UsersService {
   async unsetUserProfileById(userId: number): Promise<void> {
     try {
       return await this.userRepository.createQueryBuilder()
-      .relation(User, 'userProfiles')
-      .of(userId)
-      .set(null)
+        .relation(User, 'userProfiles')
+        .of(userId)
+        .set(null)
     } catch (err) {
 
     }

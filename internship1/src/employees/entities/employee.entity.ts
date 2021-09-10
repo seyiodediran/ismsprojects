@@ -1,5 +1,5 @@
 import { Department } from "src/departments/entities/department.entity";
-import {Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
 export class Employee{
@@ -28,6 +28,10 @@ export class Employee{
     @Column({ nullable: true })
     photo: string
 
+    @Column()
+    departmentId: number
+
     @ManyToOne(() => Department, department =>department.employees)
+    @JoinColumn({name: 'departmentId'})
     department: Department
 }
