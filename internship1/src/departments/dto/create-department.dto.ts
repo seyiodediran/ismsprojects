@@ -1,6 +1,7 @@
-export class CreateDepartmentDto {
+import { CountryList } from "src/global/app.enum";
 
-    readonly name: string;
-    readonly description?: string;
-    readonly location: string;
+export class CreateDepartmentDto {
+  readonly name: string;
+  readonly description?: string;
+  readonly location: CountryList;
 }

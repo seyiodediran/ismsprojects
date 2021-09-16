@@ -1,37 +1,44 @@
-import { Department } from "src/departments/entities/department.entity";
-import {Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import { Department } from 'src/departments/entities/department.entity';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
-export class Employee{
-    @PrimaryGeneratedColumn()
-    id:number;
-    
-    @Index()
-    @Column({ nullable: true }) //nullable just in case it is not allocated from the very beginning. 
-    employeeNumber: string
+export class Employee {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    firstName: string
+  @Index()
+  @Column({ nullable: true }) //nullable just in case it is not allocated from the very beginning.
+  employeeNumber: string;
 
-    @Column({ nullable: true })
-    middleName: string
+  @Column()
+  firstName: string;
 
-    @Column()
-    lastName: string
+  @Column({ nullable: true })
+  middleName: string;
 
-    @Column({ nullable: true })
-    jobPosition: string
+  @Column()
+  lastName: string;
 
-    @Column({ nullable: true })
-    jobTitle: string
+  @Column({ nullable: true })
+  jobPosition: string;
 
-    @Column({ nullable: true })
-    photo: string
+  @Column({ nullable: true })
+  jobTitle: string;
 
-    @Column()
-    departmentId: number
+  @Column({ nullable: true })
+  photo: string;
 
-    @ManyToOne(() => Department, department =>department.employees)
-    @JoinColumn({name: 'departmentId'})
-    department: Department
+  @Column()
+  departmentId: number;
+
+  @ManyToOne(() => Department, (department) => department.employees)
+  @JoinColumn({ name: 'departmentId' })
+  department: Department;
 }

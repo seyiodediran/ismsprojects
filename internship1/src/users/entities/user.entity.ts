@@ -1,127 +1,135 @@
-import { Department } from "src/departments/entities/department.entity";
-import { Employee } from "src/employees/entities/employee.entity";
-import { CountryList, Gender } from "src/global/app.enum";
-import { Role } from "src/roles/entities/role.entity";
-import { UserProfile } from "src/user-profiles/entities/user-profile.entity";
-import { Column, Entity, Index, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Department } from 'src/departments/entities/department.entity';
+import { Employee } from 'src/employees/entities/employee.entity';
+import { CountryList, Gender } from 'src/global/app.enum';
+import { Role } from 'src/roles/entities/role.entity';
+import { UserProfile } from 'src/user-profiles/entities/user-profile.entity';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number; // since it is a generated field we wouldnt add it to the dto
+  @PrimaryGeneratedColumn()
+  id: number; // since it is a generated field we wouldnt add it to the dto
 
-    @Column()
-    firstName: string;
+  @Column()
+  firstName: string;
 
-    @Column({ nullable: true })
-    middleName: string;
+  @Column({ nullable: true })
+  middleName: string;
 
-    @Column()
-    lastName: string;
+  @Column()
+  lastName: string;
 
-    @Column({ nullable: true })
-    commonName: string;
+  @Column({ nullable: true })
+  commonName: string;
 
-    @Column({ nullable: true })
-    homeAddress: string;
+  @Column({ nullable: true })
+  homeAddress: string;
 
-    @Column({ type: 'enum', enum: Gender, nullable: true }) //nullable because of Social Auth possibility of not getting it
-    gender: Gender;
+  @Column({ type: 'enum', enum: Gender, nullable: true }) //nullable because of Social Auth possibility of not getting it
+  gender: Gender;
 
-    @Column({ nullable: true }) //nullable because of Social Auth possibility of not getting it
-    dateOfBirth: Date;
+  @Column({ nullable: true }) //nullable because of Social Auth possibility of not getting it
+  dateOfBirth: Date;
 
-    @Column({ type: 'enum', enum: CountryList, nullable: true })
-    nationality: CountryList;
+  @Column({ type: 'enum', enum: CountryList, nullable: true })
+  nationality: CountryList;
 
-    @Column({ nullable: true })
-    state: string;
+  @Column({ nullable: true })
+  state: string;
 
-    @Column({ nullable: true })
-    city: string
+  @Column({ nullable: true })
+  city: string;
 
-    @Column({ nullable: true })
-    county: string
+  @Column({ nullable: true })
+  county: string;
 
-    @Column({ nullable: true })
-    zip: string;
+  @Column({ nullable: true })
+  zip: string;
 
+  @Column({ default: true })
+  isActive: boolean;
 
+  @Column({ default: false })
+  isSoftDeleted: boolean;
 
-    @Column({ default: true })
-    isActive: boolean;
+  @Column({ unique: true })
+  @Index()
+  primaryEmailAddress: string;
 
-    @Column({ default: false })
-    isSoftDeleted: boolean;
+  @Column({ nullable: true })
+  backupEmailAddress: string;
 
-    @Column({ unique: true })
-    @Index()
-    primaryEmailAddress: string;
+  @Column('simple-json', { nullable: true })
+  phone: { mobile: string[]; office: string[]; home: string[] };
 
-    @Column({ nullable: true })
-    backupEmailAddress: string;
+  @Column({ default: false })
+  isPrimaryEmailAddressVerified: boolean;
 
-    @Column("simple-json", { nullable: true })
-    phone: { mobile: string[], office: string[], home: string[] }
+  @Column({ default: false })
+  isBackupEmailAddressVerified: boolean;
 
-    @Column({ default: false })
-    isPrimaryEmailAddressVerified: boolean;
+  @Column({ select: false }) //don't select password whenever user is called. See https://typeorm.io/#/select-query-builder/hidden-columns
+  passwordHash: string;
 
-    @Column({ default: false })
-    isBackupEmailAddressVerified: boolean;
+  //set to true if password change is required
+  @Column({ default: false })
+  isPasswordChangeRequired: boolean;
 
+  //token to be generated when password change request is made
+  @Column({ unique: true, nullable: true, select: false })
+  resetPasswordToken: string;
 
-    @Column({ select: false }) //don't select password whenever user is called. See https://typeorm.io/#/select-query-builder/hidden-columns
-    passwordHash: string;
+  @Column({ nullable: true })
+  resetPasswordExpiration: Date;
 
-    //set to true if password change is required
-    @Column({ default: false })
-    isPasswordChangeRequired: boolean;
+  @Column({ nullable: true, select: false })
+  primaryEmailVerificationToken: string;
 
-    //token to be generated when password change request is made
-    @Column({ unique: true, nullable: true, select: false })
-    resetPasswordToken: string;
+  @Column({ nullable: true, select: false })
+  backupEmailVerificationToken: string;
 
-    @Column({ nullable: true })
-    resetPasswordExpiration: Date;
+  @Column({ nullable: true })
+  emailVerificationTokenExpiration: Date;
 
-    @Column({ nullable: true, select: false })
-    primaryEmailVerificationToken: string;
+  //Incorporating OTP. See https://github.com/speakeasyjs/speakeasy
+  @Column({ default: false })
+  otpEnabled: boolean;
 
-    @Column({ nullable: true, select: false })
-    backupEmailVerificationToken: string;
+  @Column({ nullable: true, select: false })
+  otpSecret: string;
 
-    @Column({ nullable: true })
-    emailVerificationTokenExpiration: Date;
+  // for refresh token save after successful login/
+  @Column({ select: false, nullable: true })
+  refreshTokenHash: string;
 
-    //Incorporating OTP. See https://github.com/speakeasyjs/speakeasy
-    @Column({ default: false })
-    otpEnabled: boolean
+  @OneToOne(() => Employee)
+  @JoinColumn()
+  employee: Employee;
 
-    @Column({ nullable: true, select: false })
-    otpSecret: string;
+  @OneToOne(() => UserProfile, (userProfile) => userProfile.user, {
+    cascade: true,
+  })
+  userProfile: UserProfile;
 
-    // for refresh token save after successful login/
-    @Column({ select: false, nullable: true })
-    refreshTokenHash: string;
+  @Column({ nullable: true })
+  departmentId: number;
 
+  @ManyToOne(() => Department, (department) => department.users, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'departmentId' })
+  department: Department;
 
-    @OneToOne(() => Employee)
-    @JoinColumn()
-    employee: Employee
-
-    @OneToOne(() => UserProfile, userProfile => userProfile.user, { cascade: true })
-    userProfile: UserProfile
-
-
-    @Column({ nullable: true })
-    departmentId: number;
-
-    @ManyToOne(() => Department, department => department.users, { cascade: true })
-    @JoinColumn({name: "departmentId"})
-    department: Department;
-
-    @ManyToMany(() => Role, role => role.users)
-    roles: Role[];
-
+  @ManyToMany(() => Role, (role) => role.users)
+  roles: Role[];
 }

@@ -9,7 +9,14 @@ import { UserProfilesModule } from './user-profiles/user-profiles.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [UsersModule, DepartmentsModule, EmployeesModule, RolesModule, UserProfilesModule, TypeOrmModule.forRoot()],
+  imports: [
+    UsersModule,
+    DepartmentsModule,
+    EmployeesModule,
+    RolesModule,
+    UserProfilesModule,
+    TypeOrmModule.forRoot(),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
