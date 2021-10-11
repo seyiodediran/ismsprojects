@@ -112,8 +112,11 @@ export class User {
   @Column({ select: false, nullable: true })
   refreshTokenHash: string;
 
+  @Column({nullable: true})
+  employeeId: number;
+
   @OneToOne(() => Employee)
-  @JoinColumn()
+  @JoinColumn({name: 'employeeId'})
   employee: Employee;
 
   @OneToOne(() => UserProfile, (userProfile) => userProfile.user, {

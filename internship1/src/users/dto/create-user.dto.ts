@@ -1,7 +1,10 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { CountryList, Gender } from 'src/global/app.enum';
 import { CreateUserProfileDto } from 'src/user-profiles/dto/create-user-profile.dto';
 
 export class CreateUserDto {
+
+  @ApiProperty()
   readonly firstName: string;
   readonly middleName?: string;
   readonly lastName: string;
@@ -21,7 +24,11 @@ export class CreateUserDto {
   readonly phone?: { mobile: string[]; office: string[]; home: string[] };
   readonly isPrimaryEmailAddressVerified?: boolean;
   readonly isBackupEmailAddressVerified?: boolean;
-  passwordHash: string;
+  /**
+   * passwordHash not set to readonly because changes will be made to 
+   * values gotten from the frontend in our backend codes
+   */
+  passwordHash: string; 
   readonly isPasswordChangeRequired?: boolean;
   readonly resetPasswordToken?: string;
   readonly resetPasswordExpiration?: Date;
@@ -33,6 +40,7 @@ export class CreateUserDto {
   readonly refreshTokenHash?: string;
   readonly userProfile?: CreateUserProfileDto;
   readonly departmentId?: number;
+  readonly employeeId?: number;
 
   // we may have some cases where we can't make use of read only. An example is the user on the client side entering their password during registeration
   // Normally passwords aren't stored in the db the way they are sent by the user. They are first of all hashed before storage. In our case, we wouldnt want to make the field
