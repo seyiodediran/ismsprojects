@@ -7,7 +7,7 @@ import { UpdateDepartmentDto } from './dto/update-department.dto';
 @ApiTags('departments')
 @Controller('departments')
 export class DepartmentsController {
-    constructor(private readonly departmentsService: DepartmentsService) {}
+    constructor(private readonly departmentsService: DepartmentsService) { }
 
     /**
      * Creates a user
@@ -15,9 +15,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Post()
+
     create(@Body() createDepartmentDto: CreateDepartmentDto, @Req() req: any) {
+
         return this.departmentsService.create(createDepartmentDto, req);
+
     }
 
     /**
@@ -25,9 +29,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Get()
+
     findAll(@Req() req: any) {
+
         return this.departmentsService.findAll(req);
+
     }
 
     /**
@@ -36,9 +44,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Get(':id')
+
     findOne(@Param('id') id: string, @Req() req: any) {
+
         return this.departmentsService.findOne(+id, req);
+
     }
 
     /**
@@ -48,9 +60,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Patch(':id')
+
     update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto, @Req() req: any) {
+
         return this.departmentsService.update(+id, updateDepartmentDto, req);
+
     }
 
     /**
@@ -59,9 +75,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Delete(':id')
+
     remove(@Param('id') id: string, @Req() req: any) {
+
         return this.departmentsService.remove(+id, req);
+
     }
 
     //Relationships
@@ -73,13 +93,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Patch(':departmentId/employees/employeeId')
-    addEmployeeById(
-        @Param('departmentId') departmentId: string,
-        @Param('employeeId') employeeId: string,
-        @Req() req: any,
-    ) {
+
+    addEmployeeById(@Param('departmentId') departmentId: string, @Param('employeeId') employeeId: string, @Req() req: any) {
+
         return this.departmentsService.addEmployeeById(+departmentId, +employeeId, req);
+
     }
 
     /**
@@ -89,9 +109,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Patch(':departmentId/employees')
+
     addEmployeesById(@Param('departmentId') departmentId: string, @Query() query: string, @Req() req: any) {
+
         return this.departmentsService.addEmployeesById(+departmentId, query['employeeId'], req);
+
     }
 
     /**
@@ -101,13 +125,13 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Delete(':departmentId/employees/employeeId')
-    removeEmployeeById(
-        @Param('departmentId') departmentId: string,
-        @Param('employeeId') employeeId: string,
-        @Req() req: any,
-    ) {
+
+    removeEmployeeById(@Param('departmentId') departmentId: string, @Param('employeeId') employeeId: string, @Req() req: any) {
+
         return this.departmentsService.removeEmployeeById(+departmentId, +employeeId, req);
+
     }
 
     /**
@@ -117,8 +141,12 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
     @Delete(':departmentId/employees')
+
     removeEmployeesById(@Param('departmentId') departmentId: string, @Query() query: string, @Req() req: any) {
+
         return this.departmentsService.removeEmployeesById(+departmentId, query['employeeId'], req);
+
     }
 }

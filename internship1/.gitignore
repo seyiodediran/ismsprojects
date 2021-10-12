@@ -1,6 +1,9 @@
 # compiled output
 /dist
 /node_modules
+.prettierrc.json
+Screenshot 2021-10-11 at 21.08.44.png
+
 
 # Logs
 logs
@@ -10,6 +13,8 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+combined.log
+error.log
 
 # OS
 .DS_Store

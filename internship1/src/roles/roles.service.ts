@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/global/error.codes';
 import { logger } from 'src/global/winston';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Connection, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity';
@@ -10,9 +10,11 @@ import { Role } from './entities/role.entity';
 @Injectable()
 export class RolesService {
     constructor(
-        @InjectRepository(Role)
-        private readonly roleRepository: Repository<Role>,
-    ) {}
+
+        @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
+        @InjectConnection() private connection: Connection
+
+    ) { }
 
     /**
      * Creates a role
@@ -20,41 +22,55 @@ export class RolesService {
      * @param req
      * @returns
      */
+
     async create(createRoleDto: CreateRoleDto, req: any): Promise<Role> {
+
         try {
+
             const newRole = await this.roleRepository.create(createRoleDto);
 
-            return await this.roleRepository.save(newRole);
+            const role = await this.roleRepository.save(newRole);
+
+            await this.connection.queryResultCache.remove(['roles'])
+
+            return role;
+
         } catch (error) {
+
             logger.error(error.message, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             logger.debug(error.stack, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
                 throw new HttpException(
+
                     {
                         status: HttpStatus.BAD_REQUEST, //??
                         error: `There was a problem creating a new role ${error.message}`,
                     },
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.BAD_REQUEST
+
                 );
+
             } else {
+
                 throw new HttpException(
+
                     {
                         status: HttpStatus.INTERNAL_SERVER_ERROR,
                         error: `There was a problem creating a new role ${error.message}`,
                     },
-                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
                 );
             }
         }
@@ -65,32 +81,44 @@ export class RolesService {
      * @param req
      * @returns
      */
+
     async findAll(req: any): Promise<Role[]> {
+
         try {
-            return await this.roleRepository.find();
+
+            return await this.roleRepository.find({
+
+                cache: {
+
+                    id:'roles',
+                    milliseconds: 10000
+
+                }
+
+            });
+
         } catch (error) {
+
             logger.error(error.message, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             logger.debug(error.stack, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
-            // no possibility of constraint since we are not writing to db
 
             throw new HttpException(
+
                 {
                     status: HttpStatus.INTERNAL_SERVER_ERROR,
                     error: `There was a problem creating a new role ${error.message}`,
                 },
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR
+
             );
         }
     }
@@ -100,35 +128,39 @@ export class RolesService {
      * @param req
      * @returns
      */
+
     async findOne(id: number, req: any): Promise<Role> {
+
         try {
+
             return await this.roleRepository.findOne(id);
+
         } catch (error) {
+
             logger.error(error.message, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             logger.debug(error.stack, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
-            // no possibility of constraint since we are not writing to db
 
             throw new HttpException(
+
                 {
                     status: HttpStatus.INTERNAL_SERVER_ERROR,
                     error: `There was a problem creating a new role ${error.message}`,
                 },
-                HttpStatus.INTERNAL_SERVER_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR
+
             );
         }
     }
+
     /**
      * Updates a role
      * @param id
@@ -136,39 +168,53 @@ export class RolesService {
      * @param req
      * @returns
      */
+
     async update(id: number, updateRoleDto: UpdateRoleDto, req: any): Promise<UpdateResult> {
+
         try {
-            return await this.roleRepository.update(id, { ...updateRoleDto }); //??
+
+           const updateResult = await this.roleRepository.update(id, { ...updateRoleDto });
+
+           await this.connection.queryResultCache.remove(['roles']);
+
+           return updateResult;
+
         } catch (error) {
+
             logger.error(error.message, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             logger.debug(error.stack, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
                 throw new HttpException(
+
                     {
                         status: HttpStatus.BAD_REQUEST,
                         error: `There was a problem updating the role ${error.message}`,
                     },
-                    HttpStatus.BAD_REQUEST,
-                );
+                    HttpStatus.BAD_REQUEST
+
+                )
+
             } else {
+
                 throw new HttpException(
+
                     {
                         status: HttpStatus.INTERNAL_SERVER_ERROR,
                         error: `There was a problem creating a new role ${error.message}`,
                     },
-                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
                 );
             }
         }
@@ -180,31 +226,56 @@ export class RolesService {
      * @param req
      * @returns
      */
+
     async remove(id: number, req: any): Promise<DeleteResult> {
+
         try {
-            return await this.roleRepository.delete(id);
+
+            const deleteResult = await this.roleRepository.delete(id);
+
+            await this.connection.queryResultCache.remove(['roles']);
+
+            return deleteResult;
+
+
         } catch (error) {
+
             logger.error(error.message, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
+
             logger.debug(error.stack, {
-                time: new Date(),
-                request_method: req.method,
-                endnpoint: req.url,
-                client: req.socket.remoteAddress,
-                agent: req.headers['user-agent'],
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
             });
-            throw new HttpException(
-                {
-                    status: HttpStatus.INTERNAL_SERVER_ERROR,
-                    error: `There was a problem removing the role ${error.message}`,
-                },
-                HttpStatus.INTERNAL_SERVER_ERROR,
-            );
+
+            if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.BAD_REQUEST,
+                        error: `There was a problem removing a role ${error.message}`,
+                    },
+                    HttpStatus.BAD_REQUEST
+
+                )
+
+            } else {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: `There was a problem removing a role ${error.message}`,
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
+                );
+            }
         }
     }
 
@@ -220,14 +291,53 @@ export class RolesService {
      * @param userId 
      * @returns 
      */
-    async addUserById(roleId: number, userId: number) {
-        try {
-            return await this.roleRepository.createQueryBuilder()
-            .relation(Role, 'users')
-            .of(roleId)
-            .add(userId);
-        } catch (error) {
 
+    async addUserById(roleId: number, userId: number, req: any) {
+
+        try {
+
+            return await this.roleRepository.createQueryBuilder()
+                .relation(Role, 'users')
+                .of(roleId)
+                .add(userId);
+
+        } catch (error) {
+        logger.error(error.message, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            logger.debug(error.stack, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
+                throw new HttpException( 
+
+                    {
+                        status: HttpStatus.BAD_REQUEST,
+                        error: `There was a problem adding a user to a role ${error.message}`,
+                    },
+                    HttpStatus.BAD_REQUEST
+
+                )
+
+            } else {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: `There was a problem adding a user to a role ${error.message}`,
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
+                );
+            }
         }
     }
 
@@ -237,32 +347,112 @@ export class RolesService {
      * @param userId 
      * @returns 
      */
-    async addUsersById(roleId: number, userId: number[]) {
-      try {
-          return await this.roleRepository.createQueryBuilder()
-          .relation(Role, 'users')
-          .of(roleId)
-          .add(userId);
-      } catch (error) {
 
-      }
-  }
+    async addUsersById(roleId: number, userId: number[], req: any) {
 
-  /**
-   * Removes a user from a role
-   * @param roleId 
-   * @param userId 
-   * @returns 
-   */
-    async removeUserById(roleId: number, userId: number) {
-      try{
-        return await this.roleRepository.createQueryBuilder()
-        .relation(Role, 'users')
-        .of(roleId)
-        .remove(userId);
-      } catch(error) {
+        try {
 
-      }
+            return await this.roleRepository.createQueryBuilder()
+                .relation(Role, 'users')
+                .of(roleId)
+                .add(userId);
+
+        } catch (error) {
+
+        logger.error(error.message, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            logger.debug(error.stack, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.BAD_REQUEST,
+                        error: `There was a problem adding one or more users to a role ${error.message}`,
+                    },
+                    HttpStatus.BAD_REQUEST
+
+                )
+
+            } else {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: `There was a problem adding one or more users to a role ${error.message}`,
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
+                );
+            }
+        }
+    }
+
+    /**
+     * Removes a user from a role
+     * @param roleId 
+     * @param userId 
+     * @returns 
+     */
+
+    async removeUserById(roleId: number, userId: number, req: any) {
+
+        try {
+
+            return await this.roleRepository.createQueryBuilder()
+                .relation(Role, 'users')
+                .of(roleId)
+                .remove(userId);
+
+        } catch (error) {
+
+        logger.error(error.message, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            logger.debug(error.stack, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.BAD_REQUEST,
+                        error: `There was a problem removing a user from a role ${error.message}`
+                    },
+                    HttpStatus.BAD_REQUEST
+
+                )
+
+            } else {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: `There was a problem removing a user from a role ${error.message}`
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
+                );
+            }
+        }
     }
 
     /**
@@ -271,16 +461,56 @@ export class RolesService {
      * @param userId 
      * @returns 
      */
-    async removeUsersById(roleId: number, userId: number[]) {
-      try {
-          return await this.roleRepository.createQueryBuilder()
-          .relation(Role, 'users')
-          .of(roleId)
-          .remove(userId);
-      } catch (error) {
 
-      }
-  }
+    async removeUsersById(roleId: number, userId: number[], req: any) {
+
+        try {
+
+            return await this.roleRepository.createQueryBuilder()
+                .relation(Role, 'users')
+                .of(roleId)
+                .remove(userId);
+
+        } catch (error) {
+
+            logger.error(error.message, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            logger.debug(error.stack, {
+
+                time: new Date(), request_method: req.method, endnpoint: req.url, client: req.socket.remoteAddress, agent: req.headers['user-agent']
+
+            });
+
+            if (error && error.code == PG_UNIQUE_CONSTRAINT_VIOLATION) {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.BAD_REQUEST,
+                        error: `There was a problem removing one or more users from a role ${error.message}`,
+                    },
+                    HttpStatus.BAD_REQUEST
+
+                )
+
+            } else {
+
+                throw new HttpException(
+
+                    {
+                        status: HttpStatus.INTERNAL_SERVER_ERROR,
+                        error: `There was a problem removing one or more users from a role ${error.message}`,
+                    },
+                    HttpStatus.INTERNAL_SERVER_ERROR
+
+                );
+            }
+        }
+    }
 
 
 }
