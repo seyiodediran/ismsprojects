@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { PG_UNIQUE_CONSTRAINT_VIOLATION } from 'src/global/error.codes';
 import { logger } from 'src/global/winston';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Connection, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserProfile } from './entities/user-profile.entity';
@@ -11,7 +11,8 @@ import { UserProfile } from './entities/user-profile.entity';
 export class UserProfilesService {
   constructor(
 
-    @InjectRepository(UserProfile) private readonly userProfileRepository: Repository<UserProfile>
+    @InjectRepository(UserProfile) private readonly userProfileRepository: Repository<UserProfile>,
+    @InjectConnection() private connection: Connection
 
   ) { }
 
@@ -21,7 +22,11 @@ export class UserProfilesService {
 
       const newUserProfile = await this.userProfileRepository.create(createUserProfileDto);
 
-      return await this.userProfileRepository.save(newUserProfile);
+      const userProfile = await this.userProfileRepository.save(newUserProfile);
+
+      await this.connection.queryResultCache.remove(['userProfiles']);
+
+      return userProfile;
 
     } catch (error) {
 
@@ -68,7 +73,16 @@ export class UserProfilesService {
 
     try {
 
-      return await this.userProfileRepository.find();
+      return await this.userProfileRepository.find({
+
+        cache: {
+
+          id: 'userProfiles',
+          milliseconds: 10000
+
+        }
+
+      });
 
     } catch (error) {
 
@@ -138,7 +152,11 @@ export class UserProfilesService {
 
     try {
 
-      return await this.userProfileRepository.update(id, { ...updateUserProfileDto });
+      const updateResult = await this.userProfileRepository.update(id, { ...updateUserProfileDto });
+
+      await this.connection.queryResultCache.remove(['userProfiles']);
+
+      return updateResult;
 
     } catch (error) {
 
@@ -185,7 +203,11 @@ export class UserProfilesService {
 
     try {
 
-      return await this.userProfileRepository.delete(id);
+      const deleteResult = await this.userProfileRepository.delete(id);
+
+      await this.connection.queryResultCache.remove(['userProfiles']);
+
+      return deleteResult;
 
     } catch (error) {
 

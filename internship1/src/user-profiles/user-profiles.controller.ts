@@ -1,100 +1,150 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { UserProfilesService } from './user-profiles.service';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { UserProfile } from './entities/user-profile.entity';
 
 @ApiTags('user-profiles')
 @Controller('user-profiles')
 export class UserProfilesController {
 
-  constructor(
+    constructor(private readonly UserProfilesService: UserProfilesService) { }
 
-    private readonly userProfilesService: UserProfilesService
+    /**
+     * @param createUserProfileDto 
+     * @param req 
+     * @returns 
+     */
 
-  ) { }
+    @ApiOperation({ description: 'Creates a user profile' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  /**
-   * Creates a user profile
-   * @param createUserProfileDto 
-   * @param req 
-   * @returns 
-   */
-  @Post()
+      description: 'user profile created successfully',
+      schema: {
+        type: 'object',
+        $ref: getSchemaPath(UserProfile),
+      },
 
-  create(@Body() createUserProfileDto: CreateUserProfileDto, @Req() req: any) {
+    })
 
-    return this.userProfilesService.create(createUserProfileDto, req);
+    @Post()
 
-  }
+    create(@Body() createUserProfileDto: CreateUserProfileDto, @Req() req: any) {
 
-  /**
-   * Fetches all user profiles
-   * @param req 
-   * @returns 
-   */
+      return this.UserProfilesService.create(createUserProfileDto, req);
 
-  @Get()
+    }
 
-  findAll(@Req() req: any) {
+    /**
+     * @param req 
+     * @returns 
+     */
 
-    return this.userProfilesService.findAll(req);
+    @ApiOperation({ description: 'Fetches all user profiles' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  }
+      description: 'User profiles fetched successfully',
+      schema: {
+        type: 'object',
+        $ref: getSchemaPath(UserProfile),
+      },
 
-  /**
-   * Fetches a user profile
-   * @param id 
-   * @param req 
-   * @returns 
-   */
+    })
 
-  @Get(':id')
+    @Get()
 
-  findOne(@Param('id') id: string, @Req() req: any) {
+    findAll(@Req() req: any) {
 
-    return this.userProfilesService.findOne(+id, req);
+      return this.UserProfilesService.findAll(req);
 
-  }
+    }
 
-  /**
-   * Updates a user profile
-   * @param id 
-   * @param updateUserProfileDto 
-   * @param req 
-   * @returns 
-   */
+    /**
+     * @param id 
+     * @param req 
+     * @returns 
+     */
 
-  @Patch(':id')
+    @ApiOperation({ description: 'Fetches a user profile' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  update(@Param('id') id: string, @Body() updateUserProfileDto: UpdateUserProfileDto, @Req() req: any) {
+      description: 'User profile fetched successfully',
+      schema: {
+        type: 'object',
+        $ref: getSchemaPath(UserProfile),
+      },
 
-    return this.userProfilesService.update(+id, updateUserProfileDto, req);
+    })
 
-  }
+    @Get(':id')
 
-  /**
-   * Deletes a user profile
-   * @param id 
-   * @param req 
-   * @returns 
-   */
+    findOne(@Param('id') id: string, @Req() req: any) {
 
-  @Delete(':id')
+      return this.UserProfilesService.findOne(+id, req);
 
-  remove(@Param('id') id: string, @Req() req: any) {
+    }
 
-    return this.userProfilesService.remove(+id, req);
+    /**
+     * @param id 
+     * @param updateUserProfileDto 
+     * @param req 
+     * @returns 
+     */
 
-  }
+    @ApiOperation({ description: 'Updates a user profile' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+      description: 'User profile updated successfully',
+      schema: {
+        type: 'object',
+        $ref: getSchemaPath(UserProfile),
+      },
+
+    })
+
+    @Patch(':id')
+
+    update(@Param('id') id: string, @Body() updateUserProfileDto: UpdateUserProfileDto, @Req() req: any) {
+
+      return this.UserProfilesService.update(+id, updateUserProfileDto, req);
+
+    }
+
+    /**
+     * @param id 
+     * @param req 
+     * @returns 
+     */
+
+    @ApiOperation({ description: 'Removes a user profile' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+      description: 'User profile removed successfully',
+      schema: {
+        type: 'object',
+        $ref: getSchemaPath(UserProfile),
+      },
+
+    })
+
+    @Delete(':id')
+
+    remove(@Param('id') id: string, @Req() req: any) {
+
+      return this.UserProfilesService.remove(+id, req);
+
+    }
 
 }
+

@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { Department } from './entities/department.entity';
 
 @ApiTags('departments')
 @Controller('departments')
@@ -10,11 +11,23 @@ export class DepartmentsController {
     constructor(private readonly departmentsService: DepartmentsService) { }
 
     /**
-     * Creates a user
      * @param createDepartmentDto
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Creates a department' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Department created successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Post()
 
@@ -25,10 +38,22 @@ export class DepartmentsController {
     }
 
     /**
-     * Finds all departments
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Fetches all departments' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Departments fetched successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Get()
 
@@ -39,11 +64,23 @@ export class DepartmentsController {
     }
 
     /**
-     * Finds a department
      * @param id
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Fetches a departments' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Department fetched successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Get(':id')
 
@@ -54,12 +91,24 @@ export class DepartmentsController {
     }
 
     /**
-     * Updates a department
      * @param id
      * @param updateDepartmentDto
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'FUpdates a departments' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Department updated successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Patch(':id')
 
@@ -70,11 +119,23 @@ export class DepartmentsController {
     }
 
     /**
-     * Deletes a department
      * @param id
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Removes a departments' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Department removed successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Delete(':id')
 
@@ -87,12 +148,24 @@ export class DepartmentsController {
     //Relationships
 
     /**
-     * Adds an employee to a department
      * @param departmentId
      * @param employeeId
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Adds an employee to a department' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Employee added to department successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Patch(':departmentId/employees/employeeId')
 
@@ -103,12 +176,24 @@ export class DepartmentsController {
     }
 
     /**
-     * Adds one or multiple employees to a department
      * @param departmentId
      * @param query
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Adds one or more employees to a department' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Employee(s) added to department successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Patch(':departmentId/employees')
 
@@ -119,12 +204,24 @@ export class DepartmentsController {
     }
 
     /**
-     * Remove an employee from a department
      * @param departmentId
      * @param employeeId
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Removes an employee from a department' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Employee removed from department successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Delete(':departmentId/employees/employeeId')
 
@@ -141,6 +238,19 @@ export class DepartmentsController {
      * @param req
      * @returns
      */
+
+    @ApiOperation({ description: 'Removes one or more employees from a department' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Employee(s) removed from department successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Department),
+        },
+
+    })
 
     @Delete(':departmentId/employees')
 

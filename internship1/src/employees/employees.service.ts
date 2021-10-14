@@ -28,7 +28,7 @@ export class EmployeesService {
 
       const employee = await this.employeeRepository.save(newEmployee);
 
-      await this.connection.queryResultCache.remove(['employee']);
+      await this.connection.queryResultCache.remove(['employees']);
 
       return employee;
 
@@ -234,7 +234,12 @@ export class EmployeesService {
 
     try {
 
-      return await this.employeeRepository.update(id, { ...updateEmployeeDto });
+      const updateResult = await this.employeeRepository.update(id, { ...updateEmployeeDto });
+
+      await this.connection.queryResultCache.remove(['employees']);
+
+      return updateResult;
+
 
     } catch (error) {
 
@@ -281,7 +286,11 @@ export class EmployeesService {
 
     try {
 
-      return await this.employeeRepository.delete(id);
+      const deleteResult = await this.employeeRepository.delete(id);
+
+      await this.connection.queryResultCache.remove(['employees']);
+
+      return deleteResult
 
     } catch (error) {
 

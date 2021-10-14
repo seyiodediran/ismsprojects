@@ -26,6 +26,4 @@ export class Department {
   @OneToMany(() => Employee, (employee) => employee.department)
   employees: Employee[];
 
-  @OneToMany(() => User, (user) => user.department)
-  users: User[];
 }

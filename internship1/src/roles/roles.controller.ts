@@ -2,149 +2,258 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiTags, getSchemaPath } from '@nestjs/swagger';
+import { Role } from './entities/role.entity';
 
 @ApiTags('roles')
 @Controller('roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) { }
+    constructor(private readonly rolesService: RolesService) { }
 
-  /**
-   * Create a role
-   * @param createRoleDto 
-   * @param req 
-   * @returns 
-   */
+    /**
+     * @param createRoleDto 
+     * @param req 
+     * @returns 
+     */
 
-  @Post()
+    @ApiOperation({ description: 'Creates a Role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  create(@Body() createRoleDto: CreateRoleDto, @Req() req: any) {
+        description: 'Role created successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
 
-    return this.rolesService.create(createRoleDto, req);
+    })
 
-  }
+    @Post()
 
-  /**
-   * Returns all roles
-   * @param req 
-   * @returns 
-   */
+    create(@Body() createRoleDto: CreateRoleDto, @Req() req: any) {
 
-  @Get()
+      return this.rolesService.create(createRoleDto, req);
 
-  findAll(@Req() req: any) {
+    }
 
-    return this.rolesService.findAll(req);
+    /**
+     * @param req 
+     * @returns 
+     */
 
-  }
+    @ApiOperation({ description: 'Fetches all roles' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  /**
-   * Returns a single role
-   * @param id 
-   * @param req 
-   * @returns 
-   */
+        description: 'Roles fetched successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
 
-  @Get(':id')
+    })
 
-  findOne(@Param('id') id: string, @Req() req: any) {
+    @Get()
 
-    return this.rolesService.findOne(+id, req);
+    findAll(@Req() req: any) {
 
-  }
+      return this.rolesService.findAll(req);
 
-  /**
-   * Update a role
-   * @param id 
-   * @param updateRoleDto 
-   * @param req 
-   * @returns 
-   */
+    }
 
-  @Patch(':id')
+    /**
+     * @param id 
+     * @param req 
+     * @returns 
+     */
 
-  update( @Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto, @Req() req: any) {
+    @ApiOperation({ description: 'Fetches a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-    return this.rolesService.update(+id, updateRoleDto, req);
+        description: 'Role fetched successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
 
-  }
+    })
 
-  /**
-   * Remove a role
-   * @param id 
-   * @param req 
-   * @returns 
-   */
+    @Get(':id')
 
-  @Delete(':id')
+    findOne(@Param('id') id: string, @Req() req: any) {
 
-  remove(@Param('id') id: string, @Req() req: any) {
+      return this.rolesService.findOne(+id, req);
 
-    return this.rolesService.remove(+id, req);
+    }
 
-  }
+    /**
+     * @param id 
+     * @param updateRoleDto 
+     * @param req 
+     * @returns 
+     */
 
-  //Relationships
+    @ApiOperation({ description: 'Updates a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Role updated successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
+
+    })
+
+    @Patch(':id')
+
+    update( @Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto, @Req() req: any) {
+
+      return this.rolesService.update(+id, updateRoleDto, req);
+
+    }
+
+    /**
+     * @param id 
+     * @param req 
+     * @returns 
+     */
+
+    @ApiOperation({ description: 'Removes a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Role removed successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
+
+    })
+
+    @Delete(':id')
+
+    remove(@Param('id') id: string, @Req() req: any) {
+
+      return this.rolesService.remove(+id, req);
+
+    }
+
+    //Relationships
 
 
-  /**
-   * Adds a user to a role
-   * @param roleId 
-   * @param userId 
-   * @returns 
-   */
+    /**
+     * @param roleId 
+     * @param userId 
+     * @returns 
+     */
 
-  @Patch(':roleId/users/:userId')
+    @ApiOperation({ description: 'Adds a user to a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  addUserById(@Param('roleId') roleId: string, @Param('userId') userId: string, @Req() req: any) {
+        description: 'User added to role successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
 
-    return this.rolesService.addUserById(+roleId, +userId, req)
+    })
 
-  }
+    @Patch(':roleId/users/:userId')
 
-  /**
-   * Adds one or more users to a role
-   * @param roleId 
-   * @param userquery 
-   * @returns 
-   */
+    addUserById(@Param('roleId') roleId: string, @Param('userId') userId: string, @Req() req: any) {
 
-  @Patch(':roleId/users')
+      return this.rolesService.addUserById(+roleId, +userId, req)
 
-  addUsersById(@Param('roleId') roleId: string, @Query() userquery: string, @Req() req: any) {
+    }
 
-    return this.rolesService.addUsersById(+roleId, userquery['userId'], req)
+    /**
+     * @param roleId 
+     * @param userquery 
+     * @returns 
+     */
 
-  }
+    @ApiOperation({ description: 'Adds one or more users to a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  /**
-   * Removes a user from a role
-   * @param roleId 
-   * @param userId 
-   * @returns 
-   */
+        description: 'User(s) added to role successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
 
-  @Patch(':roleId/users/:userId')
+    })
 
-  removeUserById(@Param('roleId') roleId: string, @Param('userId') userId: string, @Req() req: any) {
+    @Patch(':roleId/users')
 
-    return this.rolesService.removeUserById(+roleId, +userId, req)
-    
-  }
+    addUsersById(@Param('roleId') roleId: string, @Query() query: string, @Req() req: any) {
 
-  /**
-   * Remove one or more users from a role
-   * @param roleId 
-   * @param userquery 
-   * @returns 
-   */
+      return this.rolesService.addUsersById(+roleId, query['userId'], req)
 
-  @Patch(':roleId/users')
+    }
 
-  removeUsersById(@Param('roleId') roleId: string, @Query() userquery: string, @Req() req: any) {
+    /**
+     * @param roleId 
+     * @param userId 
+     * @returns 
+     */
 
-    return this.rolesService.removeUsersById(+roleId, userquery['userId'], req)
+    @ApiOperation({ description: 'Removes a user from a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
 
-  }
+        description: 'User removed from role successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
+
+    })
+
+    @Delete(':roleId/users/:userId')
+
+    removeUserById(@Param('roleId') roleId: string, @Param('userId') userId: string, @Req() req: any) {
+
+      return this.rolesService.removeUserById(+roleId, +userId, req)
+      
+    }
+
+    /**
+     * @param roleId 
+     * @param userquery 
+     * @returns 
+     */
+
+    @ApiOperation({ description: 'Removes one or more users from a role' })
+    @ApiBadRequestResponse({ description: 'Bad request: constraint problem' })
+    @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+    @ApiOkResponse({
+
+        description: 'Users removed from a role successfully',
+        schema: {
+            type: 'object',
+            $ref: getSchemaPath(Role),
+        },
+
+    })
+
+    @Delete(':roleId/users')
+
+    removeUsersById(@Param('roleId') roleId: string, @Query() userquery: string, @Req() req: any) {
+
+      return this.rolesService.removeUsersById(+roleId, userquery['userId'], req)
+
+    }
 
 }

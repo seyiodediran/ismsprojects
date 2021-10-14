@@ -115,23 +115,13 @@ export class User {
   @Column({nullable: true})
   employeeId: number;
 
-  @OneToOne(() => Employee)
-  @JoinColumn({name: 'employeeId'})
+  @OneToOne(() => Employee, (employee) => employee.user)
   employee: Employee;
 
   @OneToOne(() => UserProfile, (userProfile) => userProfile.user, {
     cascade: true,
   })
   userProfile: UserProfile;
-
-  @Column({ nullable: true })
-  departmentId: number;
-
-  @ManyToOne(() => Department, (department) => department.users, {
-    cascade: true,
-  })
-  @JoinColumn({ name: 'departmentId' })
-  department: Department;
 
   @ManyToMany(() => Role, (role) => role.users)
   roles: Role[];

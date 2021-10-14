@@ -10,4 +10,5 @@ export class CreateEmployeeDto {
   readonly jobTitle?: string;
   readonly photo?: string;
   readonly departmentId?: number;
+  readonly userId?: number;
 }

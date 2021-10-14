@@ -5,6 +5,9 @@ import { CreateUserProfileDto } from 'src/user-profiles/dto/create-user-profile.
 export class CreateUserDto {
 
   @ApiProperty()
+  /**
+   * @Example 'Seyi'
+   */
   readonly firstName: string;
   readonly middleName?: string;
   readonly lastName: string;
